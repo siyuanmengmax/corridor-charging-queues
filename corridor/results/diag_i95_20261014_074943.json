@@ -1,0 +1,953 @@
+[
+  {
+    "n_requests": 287,
+    "n_unserved": 0,
+    "n_no_station": 1,
+    "n_rejected": 7,
+    "n_lost": 0,
+    "access_mean_min": 50.88444444444444,
+    "access_max_min": 828.1833333333333,
+    "drain_min": 795.0,
+    "station_mean_min": 48.70042680881969,
+    "station_p95_min": 107.5900322577226,
+    "charge_mean_min": 22.106216282503905,
+    "by_station": {
+      "cs_0": {
+        "n": 25,
+        "wait_mean": 1.766,
+        "charge_mean": 15.629219844491834,
+        "wait_max": 13.7
+      },
+      "cs_1": {
+        "n": 5,
+        "wait_mean": 15.189999999999998,
+        "charge_mean": 41.254315765188245,
+        "wait_max": 37.43333333333333
+      },
+      "cs_10": {
+        "n": 25,
+        "wait_mean": 2.535333333333333,
+        "charge_mean": 18.5016563472948,
+        "wait_max": 8.15
+      },
+      "cs_11": {
+        "n": 11,
+        "wait_mean": 536.9939393939393,
+        "charge_mean": 83.0816538492161,
+        "wait_max": 792.0166666666667
+      },
+      "cs_12": {
+        "n": 37,
+        "wait_mean": 3.2734234234234227,
+        "charge_mean": 17.674062868260226,
+        "wait_max": 9.616666666666667
+      },
+      "cs_2": {
+        "n": 4,
+        "wait_mean": 32.525,
+        "charge_mean": 44.880082613740115,
+        "wait_max": 87.7
+      },
+      "cs_3": {
+        "n": 37,
+        "wait_mean": 1.8608108108108106,
+        "charge_mean": 17.567327544986632,
+        "wait_max": 9.05
+      },
+      "cs_4": {
+        "n": 18,
+        "wait_mean": 24.651851851851852,
+        "charge_mean": 22.61133848053719,
+        "wait_max": 67.51666666666667
+      },
+      "cs_5": {
+        "n": 34,
+        "wait_mean": 2.7593137254901947,
+        "charge_mean": 17.576569263586432,
+        "wait_max": 8.7
+      },
+      "cs_6": {
+        "n": 34,
+        "wait_mean": 2.4044117647058827,
+        "charge_mean": 20.91751323058248,
+        "wait_max": 12.4
+      },
+      "cs_7": {
+        "n": 31,
+        "wait_mean": 4.613978494623656,
+        "charge_mean": 17.94842177331204,
+        "wait_max": 23.3
+      },
+      "cs_8": {
+        "n": 19,
+        "wait_mean": 7.077192982456141,
+        "charge_mean": 16.937443619417888,
+        "wait_max": 19.05
+      },
+      "cs_9": {
+        "n": 5,
+        "wait_mean": 54.41333333333334,
+        "charge_mean": 49.872557522701825,
+        "wait_max": 105.16666666666667
+      }
+    },
+    "offered_load": 0.7500323381563825,
+    "mean_wait_min": 26.594210526315788,
+    "max_wait_min": 792.0166666666667,
+    "p95_wait_min": 67.49333333333334,
+    "congestion_rate": 0.34156378600823045,
+    "n_served": 285,
+    "method": "StaticCap",
+    "seed": 0,
+    "wall_time_s": 59.99392328504473,
+    "solve_time_mean_ms": 206.1835227433188,
+    "solve_time_p95_ms": 928.9357672445423,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 345,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 3,
+    "n_lost": 0,
+    "access_mean_min": 36.56894379844962,
+    "access_max_min": 337.01666666666665,
+    "drain_min": 305.0,
+    "station_mean_min": 32.53837699987034,
+    "station_p95_min": 83.01597488427096,
+    "charge_mean_min": 20.654123123901364,
+    "by_station": {
+      "cs_0": {
+        "n": 31,
+        "wait_mean": 5.038709677419354,
+        "charge_mean": 16.50025963946715,
+        "wait_max": 20.016666666666666
+      },
+      "cs_1": {
+        "n": 5,
+        "wait_mean": 30.610000000000003,
+        "charge_mean": 42.26074570644464,
+        "wait_max": 53.15
+      },
+      "cs_10": {
+        "n": 36,
+        "wait_mean": 8.87175925925926,
+        "charge_mean": 18.408094858986235,
+        "wait_max": 30.366666666666667
+      },
+      "cs_11": {
+        "n": 7,
+        "wait_mean": 180.07619047619048,
+        "charge_mean": 77.70962919707243,
+        "wait_max": 326.1666666666667
+      },
+      "cs_12": {
+        "n": 49,
+        "wait_mean": 3.979931972789115,
+        "charge_mean": 16.115998659012288,
+        "wait_max": 13.733333333333333
+      },
+      "cs_2": {
+        "n": 8,
+        "wait_mean": 98.19791666666666,
+        "charge_mean": 50.50335368182115,
+        "wait_max": 205.3
+      },
+      "cs_3": {
+        "n": 41,
+        "wait_mean": 4.501626016260163,
+        "charge_mean": 16.93566356448949,
+        "wait_max": 16.116666666666667
+      },
+      "cs_4": {
+        "n": 19,
+        "wait_mean": 5.434210526315789,
+        "charge_mean": 21.6736767410516,
+        "wait_max": 19.783333333333335
+      },
+      "cs_5": {
+        "n": 39,
+        "wait_mean": 2.8465811965811967,
+        "charge_mean": 16.996513122573326,
+        "wait_max": 12.316666666666666
+      },
+      "cs_6": {
+        "n": 37,
+        "wait_mean": 1.7837837837837838,
+        "charge_mean": 19.812884737524985,
+        "wait_max": 12.366666666666667
+      },
+      "cs_7": {
+        "n": 45,
+        "wait_mean": 7.738148148148148,
+        "charge_mean": 18.22244242946224,
+        "wait_max": 28.683333333333334
+      },
+      "cs_8": {
+        "n": 23,
+        "wait_mean": 6.219565217391303,
+        "charge_mean": 18.215050991085185,
+        "wait_max": 21.2
+      },
+      "cs_9": {
+        "n": 4,
+        "wait_mean": 65.57916666666667,
+        "charge_mean": 60.19452520089541,
+        "wait_max": 105.61666666666666
+      }
+    },
+    "offered_load": 0.8458355184073892,
+    "mean_wait_min": 11.884253875968993,
+    "max_wait_min": 326.1666666666667,
+    "p95_wait_min": 36.97499999999997,
+    "congestion_rate": 0.5724137931034483,
+    "n_served": 344,
+    "method": "StaticCap",
+    "seed": 1,
+    "wall_time_s": 49.879759876057506,
+    "solve_time_mean_ms": 66.08858886904207,
+    "solve_time_p95_ms": 158.74631959013638,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 319,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 4,
+    "n_lost": 0,
+    "access_mean_min": 44.00193920335429,
+    "access_max_min": 607.1833333333333,
+    "drain_min": 605.0,
+    "station_mean_min": 41.6756937435417,
+    "station_p95_min": 132.2179298647899,
+    "charge_mean_min": 21.397653911256583,
+    "by_station": {
+      "cs_0": {
+        "n": 25,
+        "wait_mean": 2.1733333333333333,
+        "charge_mean": 16.481072795141458,
+        "wait_max": 12.516666666666667
+      },
+      "cs_1": {
+        "n": 8,
+        "wait_mean": 32.40833333333333,
+        "charge_mean": 43.14688962240895,
+        "wait_max": 123.0
+      },
+      "cs_10": {
+        "n": 30,
+        "wait_mean": 3.752777777777777,
+        "charge_mean": 16.864283372965655,
+        "wait_max": 15.633333333333333
+      },
+      "cs_11": {
+        "n": 8,
+        "wait_mean": 390.31458333333336,
+        "charge_mean": 81.28278067188116,
+        "wait_max": 545.9333333333333
+      },
+      "cs_12": {
+        "n": 45,
+        "wait_mean": 4.155555555555556,
+        "charge_mean": 16.42555953917037,
+        "wait_max": 14.2
+      },
+      "cs_2": {
+        "n": 5,
+        "wait_mean": 9.48,
+        "charge_mean": 37.314206740603524,
+        "wait_max": 43.31666666666667
+      },
+      "cs_3": {
+        "n": 34,
+        "wait_mean": 1.7406862745098037,
+        "charge_mean": 16.017679532696043,
+        "wait_max": 8.666666666666666
+      },
+      "cs_4": {
+        "n": 18,
+        "wait_mean": 20.678703703703704,
+        "charge_mean": 21.537321076821918,
+        "wait_max": 60.516666666666666
+      },
+      "cs_5": {
+        "n": 39,
+        "wait_mean": 4.6299145299145295,
+        "charge_mean": 17.727038413615276,
+        "wait_max": 22.116666666666667
+      },
+      "cs_6": {
+        "n": 50,
+        "wait_mean": 3.708999999999999,
+        "charge_mean": 19.65985543398774,
+        "wait_max": 12.783333333333333
+      },
+      "cs_7": {
+        "n": 32,
+        "wait_mean": 1.1760416666666667,
+        "charge_mean": 18.033726570106552,
+        "wait_max": 5.033333333333333
+      },
+      "cs_8": {
+        "n": 15,
+        "wait_mean": 11.548888888888888,
+        "charge_mean": 20.03117313395755,
+        "wait_max": 38.333333333333336
+      },
+      "cs_9": {
+        "n": 9,
+        "wait_mean": 184.11481481481482,
+        "charge_mean": 53.463671868274105,
+        "wait_max": 343.8333333333333
+      }
+    },
+    "offered_load": 0.810054040926142,
+    "mean_wait_min": 20.278039832285117,
+    "max_wait_min": 545.9333333333333,
+    "p95_wait_min": 75.7533333333323,
+    "congestion_rate": 0.4,
+    "n_served": 318,
+    "method": "StaticCap",
+    "seed": 2,
+    "wall_time_s": 62.41092654783279,
+    "solve_time_mean_ms": 179.48014622486036,
+    "solve_time_p95_ms": 310.0649709114807,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 311,
+    "n_unserved": 0,
+    "n_no_station": 1,
+    "n_rejected": 7,
+    "n_lost": 0,
+    "access_mean_min": 17.607311827956988,
+    "access_max_min": 60.7,
+    "drain_min": 30.0,
+    "station_mean_min": 22.189433076996465,
+    "station_p95_min": 35.35218041616434,
+    "charge_mean_min": 16.94292770065238,
+    "by_station": {
+      "cs_0": {
+        "n": 43,
+        "wait_mean": 5.789922480620156,
+        "charge_mean": 16.073845743082078,
+        "wait_max": 23.8
+      },
+      "cs_1": {
+        "n": 3,
+        "wait_mean": 1.011111111111111,
+        "charge_mean": 49.758023373566225,
+        "wait_max": 1.0166666666666666
+      },
+      "cs_10": {
+        "n": 37,
+        "wait_mean": 5.3238738738738745,
+        "charge_mean": 16.437765202052525,
+        "wait_max": 23.45
+      },
+      "cs_12": {
+        "n": 47,
+        "wait_mean": 3.543971631205673,
+        "charge_mean": 15.185696937690066,
+        "wait_max": 11.583333333333334
+      },
+      "cs_2": {
+        "n": 3,
+        "wait_mean": 15.800000000000002,
+        "charge_mean": 43.43155251364402,
+        "wait_max": 46.083333333333336
+      },
+      "cs_3": {
+        "n": 56,
+        "wait_mean": 7.63869047619048,
+        "charge_mean": 16.643231365655307,
+        "wait_max": 19.166666666666668
+      },
+      "cs_4": {
+        "n": 16,
+        "wait_mean": 6.582291666666666,
+        "charge_mean": 19.204813057287243,
+        "wait_max": 21.016666666666666
+      },
+      "cs_5": {
+        "n": 46,
+        "wait_mean": 6.846739130434783,
+        "charge_mean": 17.141074306355616,
+        "wait_max": 18.483333333333334
+      },
+      "cs_6": {
+        "n": 26,
+        "wait_mean": 0.9070512820512816,
+        "charge_mean": 16.28352716772628,
+        "wait_max": 1.1
+      },
+      "cs_7": {
+        "n": 10,
+        "wait_mean": 0.9616666666666666,
+        "charge_mean": 15.12374402671735,
+        "wait_max": 1.0166666666666666
+      },
+      "cs_8": {
+        "n": 23,
+        "wait_mean": 3.57536231884058,
+        "charge_mean": 15.532256257695382,
+        "wait_max": 13.15
+      }
+    },
+    "offered_load": 0.6252747127621711,
+    "mean_wait_min": 5.246505376344086,
+    "max_wait_min": 46.083333333333336,
+    "p95_wait_min": 16.492500000000003,
+    "congestion_rate": 0.0,
+    "n_served": 310,
+    "method": "Backlog-Greedy g=3",
+    "seed": 0,
+    "wall_time_s": 29.739419779274613,
+    "solve_time_mean_ms": 0.12169910190873835,
+    "solve_time_p95_ms": 0.18995236605405807,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 368,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 6,
+    "n_lost": 0,
+    "access_mean_min": 23.196276112624886,
+    "access_max_min": 78.9,
+    "drain_min": 50.0,
+    "station_mean_min": 24.93820411950329,
+    "station_p95_min": 44.116867641225305,
+    "charge_mean_min": 17.328349441937444,
+    "by_station": {
+      "cs_0": {
+        "n": 41,
+        "wait_mean": 14.59308943089431,
+        "charge_mean": 16.700779519400633,
+        "wait_max": 34.5
+      },
+      "cs_1": {
+        "n": 5,
+        "wait_mean": 13.673333333333332,
+        "charge_mean": 46.252101838607565,
+        "wait_max": 42.416666666666664
+      },
+      "cs_10": {
+        "n": 41,
+        "wait_mean": 4.6886178861788625,
+        "charge_mean": 15.922704957238926,
+        "wait_max": 18.283333333333335
+      },
+      "cs_12": {
+        "n": 52,
+        "wait_mean": 2.8858974358974363,
+        "charge_mean": 14.876921857474255,
+        "wait_max": 15.45
+      },
+      "cs_2": {
+        "n": 5,
+        "wait_mean": 2.456666666666667,
+        "charge_mean": 38.927468470700454,
+        "wait_max": 6.916666666666667
+      },
+      "cs_3": {
+        "n": 58,
+        "wait_mean": 13.430172413793098,
+        "charge_mean": 16.74917329759052,
+        "wait_max": 30.916666666666668
+      },
+      "cs_4": {
+        "n": 26,
+        "wait_mean": 10.508333333333335,
+        "charge_mean": 19.179966349647906,
+        "wait_max": 33.36666666666667
+      },
+      "cs_5": {
+        "n": 53,
+        "wait_mean": 9.199685534591197,
+        "charge_mean": 18.38206360688937,
+        "wait_max": 26.85
+      },
+      "cs_6": {
+        "n": 34,
+        "wait_mean": 1.9573529411764705,
+        "charge_mean": 16.659758283445797,
+        "wait_max": 12.25
+      },
+      "cs_7": {
+        "n": 24,
+        "wait_mean": 1.070138888888889,
+        "charge_mean": 15.246921517828675,
+        "wait_max": 2.9166666666666665
+      },
+      "cs_8": {
+        "n": 27,
+        "wait_mean": 5.13148148148148,
+        "charge_mean": 14.907611064970752,
+        "wait_max": 15.05
+      },
+      "cs_9": {
+        "n": 1,
+        "wait_mean": 1.0166666666666666,
+        "charge_mean": 43.19964917812823,
+        "wait_max": 1.0166666666666666
+      }
+    },
+    "offered_load": 0.7570838387132193,
+    "mean_wait_min": 7.609854677565849,
+    "max_wait_min": 42.416666666666664,
+    "p95_wait_min": 23.708333333333332,
+    "congestion_rate": 0.0,
+    "n_served": 367,
+    "method": "Backlog-Greedy g=3",
+    "seed": 1,
+    "wall_time_s": 26.084544335957617,
+    "solve_time_mean_ms": 0.12145103909165027,
+    "solve_time_p95_ms": 0.18952786922454826,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 348,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 5,
+    "n_lost": 0,
+    "access_mean_min": 18.136542145593868,
+    "access_max_min": 65.63333333333334,
+    "drain_min": 35.0,
+    "station_mean_min": 22.81096503187108,
+    "station_p95_min": 38.046360604150415,
+    "charge_mean_min": 16.989509093173776,
+    "by_station": {
+      "cs_0": {
+        "n": 42,
+        "wait_mean": 8.184126984126982,
+        "charge_mean": 16.35800175430888,
+        "wait_max": 18.5
+      },
+      "cs_1": {
+        "n": 5,
+        "wait_mean": 1.61,
+        "charge_mean": 41.77458972562171,
+        "wait_max": 2.9
+      },
+      "cs_10": {
+        "n": 46,
+        "wait_mean": 7.209782608695652,
+        "charge_mean": 16.15634088252574,
+        "wait_max": 19.533333333333335
+      },
+      "cs_12": {
+        "n": 52,
+        "wait_mean": 2.0128205128205128,
+        "charge_mean": 14.696871854445662,
+        "wait_max": 9.383333333333333
+      },
+      "cs_2": {
+        "n": 5,
+        "wait_mean": 10.7,
+        "charge_mean": 41.423359428684456,
+        "wait_max": 43.13333333333333
+      },
+      "cs_3": {
+        "n": 54,
+        "wait_mean": 10.116049382716051,
+        "charge_mean": 16.80652772140506,
+        "wait_max": 32.083333333333336
+      },
+      "cs_4": {
+        "n": 19,
+        "wait_mean": 6.95438596491228,
+        "charge_mean": 16.811270776499565,
+        "wait_max": 20.133333333333333
+      },
+      "cs_5": {
+        "n": 62,
+        "wait_mean": 6.301075268817206,
+        "charge_mean": 16.495561290697648,
+        "wait_max": 17.566666666666666
+      },
+      "cs_6": {
+        "n": 31,
+        "wait_mean": 1.4946236559139783,
+        "charge_mean": 16.706956535045542,
+        "wait_max": 7.766666666666667
+      },
+      "cs_7": {
+        "n": 8,
+        "wait_mean": 0.9333333333333333,
+        "charge_mean": 16.441759536470773,
+        "wait_max": 1.1166666666666667
+      },
+      "cs_8": {
+        "n": 22,
+        "wait_mean": 2.7083333333333335,
+        "charge_mean": 15.307922311732703,
+        "wait_max": 12.383333333333333
+      },
+      "cs_9": {
+        "n": 2,
+        "wait_mean": 0.9083333333333334,
+        "charge_mean": 32.98943323784616,
+        "wait_max": 1.0333333333333334
+      }
+    },
+    "offered_load": 0.7038510910029135,
+    "mean_wait_min": 5.8214559386973175,
+    "max_wait_min": 43.13333333333333,
+    "p95_wait_min": 16.799166666666665,
+    "congestion_rate": 0.0,
+    "n_served": 348,
+    "method": "Backlog-Greedy g=3",
+    "seed": 2,
+    "wall_time_s": 29.011612690985203,
+    "solve_time_mean_ms": 0.12411412233150149,
+    "solve_time_p95_ms": 0.1829307526350021,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 313,
+    "n_unserved": 0,
+    "n_no_station": 1,
+    "n_rejected": 11,
+    "n_lost": 0,
+    "access_mean_min": 17.610752688172045,
+    "access_max_min": 57.5,
+    "drain_min": 45.0,
+    "station_mean_min": 22.249825636320583,
+    "station_p95_min": 33.46906051242876,
+    "charge_mean_min": 16.95735251804101,
+    "by_station": {
+      "cs_0": {
+        "n": 44,
+        "wait_mean": 9.006439393939397,
+        "charge_mean": 15.987206454739145,
+        "wait_max": 20.316666666666666
+      },
+      "cs_1": {
+        "n": 1,
+        "wait_mean": 1.05,
+        "charge_mean": 36.42872649979926,
+        "wait_max": 1.05
+      },
+      "cs_10": {
+        "n": 41,
+        "wait_mean": 6.760569105691055,
+        "charge_mean": 16.43308221662012,
+        "wait_max": 18.7
+      },
+      "cs_12": {
+        "n": 40,
+        "wait_mean": 2.9733333333333336,
+        "charge_mean": 15.745703011416259,
+        "wait_max": 16.916666666666668
+      },
+      "cs_2": {
+        "n": 6,
+        "wait_mean": 11.524999999999999,
+        "charge_mean": 39.39603186106397,
+        "wait_max": 26.5
+      },
+      "cs_3": {
+        "n": 57,
+        "wait_mean": 6.6192982456140355,
+        "charge_mean": 15.882323726424957,
+        "wait_max": 12.516666666666667
+      },
+      "cs_4": {
+        "n": 14,
+        "wait_mean": 4.275,
+        "charge_mean": 19.714974684661133,
+        "wait_max": 13.75
+      },
+      "cs_5": {
+        "n": 47,
+        "wait_mean": 4.479787234042553,
+        "charge_mean": 17.716864024007922,
+        "wait_max": 15.166666666666666
+      },
+      "cs_6": {
+        "n": 26,
+        "wait_mean": 0.858333333333333,
+        "charge_mean": 16.577481228733724,
+        "wait_max": 1.1
+      },
+      "cs_7": {
+        "n": 10,
+        "wait_mean": 0.9666666666666668,
+        "charge_mean": 16.161197979327405,
+        "wait_max": 1.0333333333333334
+      },
+      "cs_8": {
+        "n": 24,
+        "wait_mean": 4.0993055555555555,
+        "charge_mean": 15.43048286332215,
+        "wait_max": 14.25
+      }
+    },
+    "offered_load": 0.6258070572134182,
+    "mean_wait_min": 5.29247311827957,
+    "max_wait_min": 26.5,
+    "p95_wait_min": 14.794166666666667,
+    "congestion_rate": 0.0,
+    "n_served": 310,
+    "method": "Fluid-MPC H=30",
+    "seed": 0,
+    "wall_time_s": 32.71185040473938,
+    "solve_time_mean_ms": 37.21614989328636,
+    "solve_time_p95_ms": 43.3895131573081,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 374,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 12,
+    "n_lost": 0,
+    "access_mean_min": 22.99349376114082,
+    "access_max_min": 90.25,
+    "drain_min": 50.0,
+    "station_mean_min": 24.517571263601326,
+    "station_p95_min": 39.79145549225649,
+    "charge_mean_min": 17.513738821533583,
+    "by_station": {
+      "cs_0": {
+        "n": 42,
+        "wait_mean": 17.14087301587302,
+        "charge_mean": 16.154162254562397,
+        "wait_max": 31.333333333333332
+      },
+      "cs_1": {
+        "n": 6,
+        "wait_mean": 29.447222222222223,
+        "charge_mean": 45.848879918495435,
+        "wait_max": 52.083333333333336
+      },
+      "cs_10": {
+        "n": 49,
+        "wait_mean": 6.670408163265305,
+        "charge_mean": 15.909398285482908,
+        "wait_max": 15.416666666666666
+      },
+      "cs_12": {
+        "n": 47,
+        "wait_mean": 2.3010638297872337,
+        "charge_mean": 15.000708521543208,
+        "wait_max": 9.766666666666667
+      },
+      "cs_2": {
+        "n": 5,
+        "wait_mean": 28.486666666666668,
+        "charge_mean": 49.09171748391615,
+        "wait_max": 83.8
+      },
+      "cs_3": {
+        "n": 56,
+        "wait_mean": 6.7375,
+        "charge_mean": 15.599737038485305,
+        "wait_max": 13.433333333333334
+      },
+      "cs_4": {
+        "n": 21,
+        "wait_mean": 5.543650793650793,
+        "charge_mean": 18.7909287970543,
+        "wait_max": 16.016666666666666
+      },
+      "cs_5": {
+        "n": 52,
+        "wait_mean": 5.83621794871795,
+        "charge_mean": 18.282158743784432,
+        "wait_max": 19.083333333333332
+      },
+      "cs_6": {
+        "n": 45,
+        "wait_mean": 2.519629629629629,
+        "charge_mean": 19.238572518461396,
+        "wait_max": 13.366666666666667
+      },
+      "cs_7": {
+        "n": 22,
+        "wait_mean": 0.9840909090909089,
+        "charge_mean": 15.463010772230996,
+        "wait_max": 1.05
+      },
+      "cs_8": {
+        "n": 29,
+        "wait_mean": 7.350574712643679,
+        "charge_mean": 15.23202714621533,
+        "wait_max": 23.983333333333334
+      }
+    },
+    "offered_load": 0.7797783713397096,
+    "mean_wait_min": 7.003832442067736,
+    "max_wait_min": 83.8,
+    "p95_wait_min": 21.629999999999985,
+    "congestion_rate": 0.0,
+    "n_served": 374,
+    "method": "Fluid-MPC H=30",
+    "seed": 1,
+    "wall_time_s": 36.89421995263547,
+    "solve_time_mean_ms": 37.35379928565887,
+    "solve_time_p95_ms": 49.39032630063593,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  },
+  {
+    "n_requests": 348,
+    "n_unserved": 0,
+    "n_no_station": 0,
+    "n_rejected": 8,
+    "n_lost": 0,
+    "access_mean_min": 17.6301724137931,
+    "access_max_min": 62.81666666666667,
+    "drain_min": 35.0,
+    "station_mean_min": 22.858534420279184,
+    "station_p95_min": 38.03563277851892,
+    "charge_mean_min": 17.29076622104548,
+    "by_station": {
+      "cs_0": {
+        "n": 45,
+        "wait_mean": 9.472222222222221,
+        "charge_mean": 16.007396187797543,
+        "wait_max": 22.233333333333334
+      },
+      "cs_1": {
+        "n": 5,
+        "wait_mean": 15.156666666666666,
+        "charge_mean": 41.33711769843817,
+        "wait_max": 27.833333333333332
+      },
+      "cs_10": {
+        "n": 46,
+        "wait_mean": 5.773550724637681,
+        "charge_mean": 15.649950748502086,
+        "wait_max": 12.933333333333334
+      },
+      "cs_11": {
+        "n": 2,
+        "wait_mean": 1.0416666666666665,
+        "charge_mean": 66.00017701131944,
+        "wait_max": 1.0666666666666667
+      },
+      "cs_12": {
+        "n": 50,
+        "wait_mean": 5.785,
+        "charge_mean": 16.107061000959888,
+        "wait_max": 17.716666666666665
+      },
+      "cs_2": {
+        "n": 6,
+        "wait_mean": 20.658333333333335,
+        "charge_mean": 35.63066435697941,
+        "wait_max": 32.06666666666667
+      },
+      "cs_3": {
+        "n": 58,
+        "wait_mean": 5.034195402298852,
+        "charge_mean": 15.720363601847854,
+        "wait_max": 14.216666666666667
+      },
+      "cs_4": {
+        "n": 19,
+        "wait_mean": 3.6710526315789465,
+        "charge_mean": 17.110023776944075,
+        "wait_max": 11.016666666666667
+      },
+      "cs_5": {
+        "n": 54,
+        "wait_mean": 5.2320987654321005,
+        "charge_mean": 17.178684598710895,
+        "wait_max": 18.783333333333335
+      },
+      "cs_6": {
+        "n": 30,
+        "wait_mean": 1.2844444444444443,
+        "charge_mean": 17.268177514612752,
+        "wait_max": 5.733333333333333
+      },
+      "cs_7": {
+        "n": 8,
+        "wait_mean": 0.9375,
+        "charge_mean": 16.264078571059855,
+        "wait_max": 1.1
+      },
+      "cs_8": {
+        "n": 23,
+        "wait_mean": 2.7086956521739127,
+        "charge_mean": 14.385764900732545,
+        "wait_max": 11.333333333333334
+      },
+      "cs_9": {
+        "n": 2,
+        "wait_mean": 1.0416666666666667,
+        "charge_mean": 37.791023806963054,
+        "wait_max": 1.05
+      }
+    },
+    "offered_load": 0.7163317434433127,
+    "mean_wait_min": 5.567768199233717,
+    "max_wait_min": 32.06666666666667,
+    "p95_wait_min": 16.89999999999999,
+    "congestion_rate": 0.0,
+    "n_served": 348,
+    "method": "Fluid-MPC H=30",
+    "seed": 2,
+    "wall_time_s": 32.33476742217317,
+    "solve_time_mean_ms": 39.922550371118696,
+    "solve_time_p95_ms": 51.104964734986424,
+    "phase": "phase2_sumo",
+    "scenario": "heavy",
+    "env": "phase2_sumo",
+    "load": "high",
+    "rate": 1.0,
+    "layout": "i95_nc",
+    "threshold": 0.3
+  }
+]

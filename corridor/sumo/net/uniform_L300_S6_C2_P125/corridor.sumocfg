@@ -1,0 +1,19 @@
+<configuration>
+    <input>
+        <net-file value="corridor.net.xml"/>
+        <route-files value="../../routes/uniform_L300_S6_C2_P125/n120_r0.8_soc0.35_T14400_seed0.rou.xml"/>
+        <additional-files value="corridor.add.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <step-length value="1"/>
+    </time>
+    <processing>
+        <ignore-route-errors value="true"/>
+        <collision.action value="none"/>
+    </processing>
+    <report>
+        <no-warnings value="true"/>
+        <no-step-log value="true"/>
+    </report>
+</configuration>

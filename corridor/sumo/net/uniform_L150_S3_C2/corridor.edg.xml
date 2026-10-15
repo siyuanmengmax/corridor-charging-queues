@@ -1,0 +1,6 @@
+<edges>
+    <edge id="e_entry" from="n_source" to="n0" numLanes="2" speed="27.78" priority="1"/>
+    <edge id="e_0" from="n0" to="n1" numLanes="2" speed="27.78" priority="1"/>
+    <edge id="e_1" from="n1" to="n2" numLanes="2" speed="27.78" priority="1"/>
+    <edge id="e_exit" from="n2" to="n_sink" numLanes="2" speed="27.78" priority="1"/>
+</edges>

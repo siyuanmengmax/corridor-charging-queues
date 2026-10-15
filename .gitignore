@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+corridor/sumo/routes/
+figures/
+.idea/
+.vscode/

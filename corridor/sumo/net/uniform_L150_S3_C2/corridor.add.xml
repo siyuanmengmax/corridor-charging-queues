@@ -1,0 +1,11 @@
+<additional>
+    <!-- Station cs_0: 12 km, 2 chargers @ 150 kW -->
+    <parkingArea id="pa_cs_0" lane="e_0_1" startPos="12450" endPos="12550" roadsideCapacity="2" name="Charging Station cs_0"/>
+    <chargingStation id="cs_0" lane="e_0_1" startPos="12450" endPos="12550" power="150000" efficiency="0.90" chargeInTransit="0"/>
+    <!-- Station cs_1: 62 km, 2 chargers @ 100 kW -->
+    <parkingArea id="pa_cs_1" lane="e_0_1" startPos="62450" endPos="62550" roadsideCapacity="2" name="Charging Station cs_1"/>
+    <chargingStation id="cs_1" lane="e_0_1" startPos="62450" endPos="62550" power="100000" efficiency="0.90" chargeInTransit="0"/>
+    <!-- Station cs_2: 112 km, 2 chargers @ 150 kW -->
+    <parkingArea id="pa_cs_2" lane="e_1_1" startPos="37450" endPos="37550" roadsideCapacity="2" name="Charging Station cs_2"/>
+    <chargingStation id="cs_2" lane="e_1_1" startPos="37450" endPos="37550" power="150000" efficiency="0.90" chargeInTransit="0"/>
+</additional>

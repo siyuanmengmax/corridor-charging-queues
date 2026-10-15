@@ -1,0 +1,5 @@
+# Tested with Python 3.11 and Eclipse SUMO 1.24.0 (sumo and netconvert on PATH; traci from the SUMO installation or `pip install traci==1.24.0`)
+numpy==1.26.4
+scipy==1.14.0
+matplotlib==3.9.1
+gurobipy==13.0.1

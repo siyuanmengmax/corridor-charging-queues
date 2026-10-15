@@ -1,0 +1,192 @@
+{
+  "name": "i95_nc",
+  "description": "I-95 southbound, VA/NC to NC/SC state line; public CCS DC fast charging",
+  "length_km": 293.1,
+  "retrieved": "2026-10-14",
+  "sources": {
+    "stations": "AFDC station API (developer.nlr.gov)",
+    "geometry": "OpenStreetMap via Overpass"
+  },
+  "vehicle_cap_kw": 150.0,
+  "sites": [
+    {
+      "km": 13.2,
+      "network": "Blink Network",
+      "rated_kw": [
+        180.0,
+        180.0,
+        180.0
+      ],
+      "afdc_ids": [
+        353503
+      ],
+      "n_chargers": 3,
+      "power_kw": 150.0
+    },
+    {
+      "km": 20.8,
+      "network": "ChargePoint Network",
+      "rated_kw": [
+        50.0
+      ],
+      "afdc_ids": [
+        187349
+      ],
+      "n_chargers": 1,
+      "power_kw": 50.0
+    },
+    {
+      "km": 32.9,
+      "network": "ChargePoint Network",
+      "rated_kw": [
+        50.0
+      ],
+      "afdc_ids": [
+        166882
+      ],
+      "n_chargers": 1,
+      "power_kw": 50.0
+    },
+    {
+      "km": 70.1,
+      "network": "Electrify America",
+      "rated_kw": [
+        350.0,
+        350.0,
+        350.0,
+        350.0
+      ],
+      "afdc_ids": [
+        166835
+      ],
+      "n_chargers": 4,
+      "power_kw": 150.0
+    },
+    {
+      "km": 96.2,
+      "network": "ChargePoint Network",
+      "rated_kw": [
+        125.0,
+        125.0
+      ],
+      "afdc_ids": [
+        202800,
+        202801
+      ],
+      "n_chargers": 2,
+      "power_kw": 125.0
+    },
+    {
+      "km": 96.2,
+      "network": "IONNA",
+      "rated_kw": [
+        400.0,
+        400.0,
+        400.0,
+        400.0
+      ],
+      "afdc_ids": [
+        463768
+      ],
+      "n_chargers": 4,
+      "power_kw": 150.0
+    },
+    {
+      "km": 120.3,
+      "network": "eVgo Network",
+      "rated_kw": [
+        100.0,
+        350.0,
+        350.0,
+        350.0,
+        350.0
+      ],
+      "afdc_ids": [
+        333697
+      ],
+      "n_chargers": 5,
+      "power_kw": 140.0
+    },
+    {
+      "km": 137.3,
+      "network": "Electrify America",
+      "rated_kw": [
+        350.0,
+        350.0,
+        350.0,
+        350.0
+      ],
+      "afdc_ids": [
+        167212
+      ],
+      "n_chargers": 4,
+      "power_kw": 150.0
+    },
+    {
+      "km": 177.0,
+      "network": "IONNA",
+      "rated_kw": [
+        400.0,
+        400.0
+      ],
+      "afdc_ids": [
+        466348
+      ],
+      "n_chargers": 2,
+      "power_kw": 150.0
+    },
+    {
+      "km": 223.8,
+      "network": "ChargePoint Network",
+      "rated_kw": [
+        50.0
+      ],
+      "afdc_ids": [
+        193913
+      ],
+      "n_chargers": 1,
+      "power_kw": 50.0
+    },
+    {
+      "km": 223.8,
+      "network": "IONNA",
+      "rated_kw": [
+        400.0,
+        400.0,
+        400.0
+      ],
+      "afdc_ids": [
+        465127
+      ],
+      "n_chargers": 3,
+      "power_kw": 150.0
+    },
+    {
+      "km": 255.9,
+      "network": "EV Connect",
+      "rated_kw": [
+        30.0
+      ],
+      "afdc_ids": [
+        328769
+      ],
+      "n_chargers": 1,
+      "power_kw": 30.0
+    },
+    {
+      "km": 255.9,
+      "network": "Electrify America",
+      "rated_kw": [
+        150.0,
+        150.0,
+        350.0,
+        350.0
+      ],
+      "afdc_ids": [
+        167147
+      ],
+      "n_chargers": 4,
+      "power_kw": 150.0
+    }
+  ]
+}
