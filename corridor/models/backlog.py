@@ -90,12 +90,23 @@ class BacklogGreedyOptimizer(_BacklogBase):
     driving to it, including those it assigned earlier in the same step.
     With assumed_power_kw set, the rule does not know the power of each station: charging
     times, including those of the vehicles queued there, are computed at that power.
+    With remaining_known=False the rule sees only which chargers are busy (port status, as
+    shared under 23 CFR 680.116(c)): each busy charger is taken to be half-way through, and
+    each queued vehicle to need, a reference session of REF_ENERGY_KWH at the station power.
+    With queue_known=False it does not see the vehicles queued at the station either.
     """
 
-    def __init__(self, en_route: bool = True, assumed_power_kw: Optional[float] = None, **kwargs):
+    REF_ENERGY_KWH = 0.6 * 70.0   # 20-80% SOC of a 70 kWh battery
+
+    def __init__(self, en_route: bool = True, assumed_power_kw: Optional[float] = None,
+                 remaining_known: bool = True, queue_known: bool = True, **kwargs):
         super().__init__(**kwargs)
         self.en_route = en_route
         self.assumed_power_kw = assumed_power_kw
+        self.remaining_known = remaining_known
+        self.queue_known = queue_known
+        assert not (en_route and not (remaining_known and queue_known)), \
+            "port-status variants are occupancy-only rules"
 
     def solve(self, ev_requests: List[EVRequest], stations: List[ChargingStation],
               travel_times: Optional[Dict[Tuple[str, str], float]] = None) -> OptimizationResult:
@@ -114,8 +125,15 @@ class BacklogGreedyOptimizer(_BacklogBase):
                 known = [(eta, svc * st.power_kw / power) for eta, svc in st.committed]
                 committed = (known + added[st.id] if self.en_route
                              else [c for c in known if c[0] <= 1e-6])
+                remaining = st.remaining_times
+                if not self.remaining_known:
+                    ref = self.REF_ENERGY_KWH / power * 60.0
+                    remaining = [0.5 * ref] * len(st.remaining_times)
+                    committed = [(eta, ref) for eta, _ in committed]
+                if not self.queue_known:
+                    committed = []
                 view = ChargingStation(st.id, st.position_km, st.n_chargers, power,
-                                       st.remaining_times, committed)
+                                       remaining, committed)
                 d = nominal_charge(ev, view, tau, self.target_soc, self.speed_kmh)
                 wait = max(0.0, charger_free_times(view, tau)[0] - tau)
                 cost = tau + self.beta * d + self.gamma_w * wait

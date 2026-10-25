@@ -59,6 +59,11 @@ def make_method(name: str):
         "Occupancy-Greedy g=3": lambda: BacklogGreedyOptimizer(gamma_w=3.0, en_route=False),
         "Occupancy-Greedy g=3 P120": lambda: BacklogGreedyOptimizer(gamma_w=3.0, en_route=False,
                                                                     assumed_power_kw=120.0),
+        # NEVI port data: which chargers are busy and their power, with and without the queue count
+        "PortStatus-Greedy g=3": lambda: BacklogGreedyOptimizer(gamma_w=3.0, en_route=False,
+                                                                remaining_known=False, queue_known=False),
+        "PortStatus+Queue-Greedy g=3": lambda: BacklogGreedyOptimizer(gamma_w=3.0, en_route=False,
+                                                                      remaining_known=False),
     }[name]()
 
 

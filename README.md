@@ -34,6 +34,7 @@ Every experiment uses `python -m corridor.experiments.run_threshold_sweep` (20 s
 |---|---|
 | E1–E3 main factorial | `--methods Greedy StaticCap "Backlog-Greedy g=3" "Fluid-MPC H=0" "Fluid-MPC H=15" "Fluid-MPC H=30" "Fluid-MPC H=60" --loads low moderate high --reference StaticCap --tag main_factorial` |
 | Attribution baselines | `--methods Power-Greedy "Occupancy-Greedy g=3" "Occupancy-Greedy g=3 P120" --loads low moderate high --reference Power-Greedy --tag attr_synth` (add `--layout i95_nc --thresholds 0.20 0.30 0.40 --loads low=0.6 moderate=0.8 high=1.0` for I-95) |
+| Port-status rules (NEVI data) | `--methods "Occupancy-Greedy g=3" "PortStatus-Greedy g=3" "PortStatus+Queue-Greedy g=3" --thresholds 0.30 --loads moderate high --reference "Occupancy-Greedy g=3" --tag portstatus_synth` (add `--layout i95_nc --loads moderate=0.8 high=1.0 --tag portstatus_i95` for I-95) |
 | E4 prediction quality | `--methods "Backlog-Greedy g=3" "Fluid-MPC H=30" --thresholds 0.30 --loads high --reference "Backlog-Greedy g=3" --prediction_noise 0.1` (also 0.2, 0.4; or `--prediction_visibility 0.75`, 0.5, 0.25) |
 | E5 charging-time variation | `--methods StaticCap "Backlog-Greedy g=3" "Fluid-MPC H=30" --thresholds 0.30 --reference StaticCap --charge_uncertainty 0.0` (also 0.4) |
 | E6 waiting weight | `--methods StaticCap Backlog-Greedy "Backlog-Greedy g=3" "Backlog-Greedy g=10" "Fluid-MPC H=30 g=1" "Fluid-MPC H=30" "Fluid-MPC H=30 g=10" --thresholds 0.30 --reference StaticCap` |
@@ -45,7 +46,7 @@ E9 (computation time) runs serially: `python -m corridor.experiments.run_timing 
 
 Figures: `python -m corridor.experiments.make_figures --out figures` reads the latest result files. Summary tables of the main factorial: `python corridor/experiments/summarize_main.py`.
 
-In the result files, `env` is `phase1` (queueing simulator) or `phase2_sumo` (SUMO); waiting times are in minutes. Method names: `Greedy` is nearest-station dispatch, `StaticCap` the static-capacity MILP, `Power-Greedy` the power-aware greedy rule, `Occupancy-Greedy g=3` the queue greedy rule (`P120`: uniform 120 kW), `Backlog-Greedy g=3` backlog greedy, and `Fluid-MPC H=<min>` fluid-queue MPC. `QA-R-MPC (current)` in the main factorial is an auxiliary method not reported in the paper. SUMO results are deterministic for a given seed; MILP solutions can vary slightly with the number of solver threads.
+In the result files, `env` is `phase1` (queueing simulator) or `phase2_sumo` (SUMO); waiting times are in minutes. Method names: `Greedy` is nearest-station dispatch, `StaticCap` the static-capacity MILP, `Power-Greedy` the power-aware greedy rule, `Occupancy-Greedy g=3` the queue greedy rule (`P120`: uniform 120 kW), `PortStatus-Greedy g=3` and `PortStatus+Queue-Greedy g=3` the port-status greedy rules without and with the queue count, `Backlog-Greedy g=3` backlog greedy, and `Fluid-MPC H=<min>` fluid-queue MPC. `QA-R-MPC (current)` in the main factorial is an auxiliary method not reported in the paper. SUMO results are deterministic for a given seed; MILP solutions can vary slightly with the number of solver threads.
 
 ## Data
 
