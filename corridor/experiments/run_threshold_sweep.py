@@ -37,7 +37,8 @@ METHODS = ["Greedy", REFERENCE, "Backlog-Greedy", "Backlog-MILP g=3"]
 
 
 def make_method(name: str):
-    from ..models.backlog import BacklogAwareOptimizer, BacklogGreedyOptimizer, FluidMPCOptimizer
+    from ..models.backlog import (BacklogAwareOptimizer, BacklogGreedyOptimizer, FluidMPCOptimizer,
+                                  OwnFleetGreedyOptimizer)
     from ..models.optimizer import GreedyOptimizer, QueueAwareOptimizer, StaticCapOptimizer
     return {
         "StaticCap":         lambda: StaticCapOptimizer(gamma_c=2.0, delta_t=5.0, speed_kmh=100.0),
@@ -64,11 +65,21 @@ def make_method(name: str):
                                                                 remaining_known=False, queue_known=False),
         "PortStatus+Queue-Greedy g=3": lambda: BacklogGreedyOptimizer(gamma_w=3.0, en_route=False,
                                                                       remaining_known=False),
+        # partial participation: a dispatcher that knows its own vehicles plus station data
+        "OwnFleet-own g=3":        lambda: OwnFleetGreedyOptimizer(level="own", gamma_w=3.0),
+        "OwnFleet-port g=3":       lambda: OwnFleetGreedyOptimizer(level="port", gamma_w=3.0),
+        "OwnFleet-port_queue g=3": lambda: OwnFleetGreedyOptimizer(level="port_queue", gamma_w=3.0),
+        "OwnFleet-station g=3":    lambda: OwnFleetGreedyOptimizer(level="station", gamma_w=3.0),
     }[name]()
 
 
-def demand(rate: float) -> dict:
-    return dict(n_vehicles=int(150 * rate), demand_rate=rate, soc_init_mean=SOC_INIT_MEAN)
+def demand(rate: float, vehicles: str = "eu") -> dict:
+    d = dict(n_vehicles=int(150 * rate), demand_rate=rate, soc_init_mean=SOC_INIT_MEAN)
+    if vehicles != "eu":   # route files of the default profile keep their names
+        from ..vehicles import get_profile
+        p = get_profile(vehicles)
+        d.update(battery_mean_kwh=p.battery_mean_kwh, battery_std_kwh=p.battery_std_kwh)
+    return d
 
 
 def run_one(job: tuple) -> dict:
@@ -76,25 +87,31 @@ def run_one(job: tuple) -> dict:
     extra = dict(job[5]) if len(job) > 5 else {}
     rate = extra.pop("rate", None) or RATES[load]
     layout = extra.pop("layout", "synthetic")
+    vehicles = extra.pop("vehicles", "eu")
+    from ..vehicles import get_profile
+    profile = get_profile(vehicles)
     opt = make_method(method)
+    if hasattr(opt, "set_vehicles"):
+        opt.set_vehicles(profile)
     if env_name == "phase1":
         from .run_experiments import CORRIDOR_PARAMS, run_episode
         from ..layouts import get_layout   # same station positions as the SUMO network
         lay = get_layout(layout)
         stations, length = lay.charging_stations(), lay.length_km
-        params = {**CORRIDOR_PARAMS, **demand(rate), "corridor_length_km": length,
+        params = {**CORRIDOR_PARAMS, **demand(rate), **profile.phase1_params(), "corridor_length_km": length,
                   "sim_duration_min": WARMUP_MIN + MEASURE_MIN, "warmup_min": WARMUP_MIN,
                   "charge_threshold": threshold, "max_detour_km": None, **extra}
         r = run_episode(method, opt, seed, stations, params)
     else:
         from .run_sumo_experiments import run_sumo_episode
         r = run_sumo_episode(
-            method, opt, seed, demand=demand(rate),
+            method, opt, seed, demand=demand(rate, vehicles),
             sim_duration_s=int((WARMUP_MIN + MEASURE_MIN) * 60), warmup_s=int(WARMUP_MIN * 60),
-            charge_threshold=threshold, max_detour_km=None, layout=layout, **extra,
+            charge_threshold=threshold, max_detour_km=None, layout=layout,
+            consumption_kwh_per_km=profile.consumption_kwh_per_km, **extra,
         )
     r.update({"env": env_name, "load": load, "rate": rate, "layout": layout, "threshold": threshold,
-              "method": method, "seed": seed, **extra})
+              "method": method, "seed": seed, "vehicles": vehicles, **extra})
     return r
 
 
@@ -148,6 +165,9 @@ if __name__ == "__main__":
     parser.add_argument("--prediction_noise", type=float, default=None)
     parser.add_argument("--prediction_visibility", type=float, default=None)
     parser.add_argument("--compliance", type=float, default=None)
+    parser.add_argument("--participation", type=float, default=None)
+    parser.add_argument("--other_choice", default=None, choices=["nearest", "free_port"])
+    parser.add_argument("--vehicles", default="eu", choices=["eu", "us"], help="see corridor/vehicles.py")
     parser.add_argument("--output_dir", default="corridor/results")
     args = parser.parse_args()
 
@@ -161,13 +181,16 @@ if __name__ == "__main__":
         ensure_network(args.layout)
         for rate in loads.values():
             for seed in range(args.n_seeds):
-                write_routes(**demand(rate), seed=seed,
+                write_routes(**demand(rate, args.vehicles), seed=seed,
                              duration_s=int((WARMUP_MIN + MEASURE_MIN) * 60), layout=args.layout)
 
-    extra = {k: getattr(args, k) for k in ("charge_uncertainty", "prediction_noise", "prediction_visibility", "compliance")
+    extra = {k: getattr(args, k) for k in ("charge_uncertainty", "prediction_noise", "prediction_visibility", "compliance",
+                                     "participation", "other_choice")
              if getattr(args, k) is not None}
     if args.layout != "synthetic":
         extra["layout"] = args.layout
+    if args.vehicles != "eu":
+        extra["vehicles"] = args.vehicles
     jobs = [(e, load, thr, m, seed, {**extra, "rate": rate}) for e in envs for load, rate in loads.items()
             for thr in args.thresholds for m in args.methods for seed in range(args.n_seeds)]
     with Pool(args.workers) as pool:

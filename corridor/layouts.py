@@ -3,6 +3,7 @@ Corridor layouts shared by the Phase 1 simulator and the SUMO environment.
 
   synthetic  300 km, 6 stations, 13 chargers (the controlled experiments; SUMO positions)
   i95_nc     I-95 southbound through North Carolina (corridor/data/i95_nc_stations.json)
+  <real>_cap<kw> a real-corridor layout with the effective power capped at <kw> instead of 150 kW
   uniform_L<km>_S<n>_C<c>[_P<kw>]  generated: n equally spaced stations with c chargers each,
              alternating 150/100 kW unless a single power P is given (E7)
 """
@@ -42,11 +43,14 @@ SYNTHETIC = Layout("synthetic", 300.0, (
 
 
 def _from_file(name: str) -> Layout:
-    d = json.loads((DATA_DIR / f"{name}_stations.json").read_text())
+    m = re.fullmatch(r"(.+)_cap(\d+)", name)
+    base, cap = (m[1], float(m[2])) if m else (name, None)
+    d = json.loads((DATA_DIR / f"{base}_stations.json").read_text())
     stations, last = [], -1.0
     for s in sorted(d["sites"], key=lambda s: s["km"]):
         km = max(s["km"], last + 0.3)    # sites at the same exit: 300 m apart
-        stations.append((round(km, 1), s["n_chargers"], s["power_kw"]))
+        power = s["power_kw"] if cap is None else sum(min(k, cap) for k in s["rated_kw"]) / len(s["rated_kw"])
+        stations.append((round(km, 1), s["n_chargers"], power))
         last = km
     return Layout(name, d["length_km"], tuple(stations))
 

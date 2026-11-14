@@ -83,8 +83,11 @@ class SumoCorridorEnv:
         prediction_noise: float = 0.0,          # relative error of predicted request time and SOC
         prediction_visibility: float = 1.0,     # share of upcoming vehicles the dispatcher can see
         compliance: float = 1.0,                # share of drivers who follow the assigned station
+        participation: float = 1.0,             # share of EVs that use the dispatcher at all
+        other_choice: str = "nearest",          # non-participants: "nearest" or "free_port"
         max_drain_s: int = 86_400,
         layout: str = "synthetic",
+        consumption_kwh_per_km: float = CONSUMPTION_KWH_PER_KM,
     ):
         self.seed = seed
         self.gui = gui
@@ -99,10 +102,17 @@ class SumoCorridorEnv:
         self.prediction_noise = prediction_noise
         self.prediction_visibility = prediction_visibility
         self.compliance = compliance
+        # Non-participants pick the nearest reachable station themselves; the dispatcher does not
+        # see them until they are at a station (queued or charging)
+        self.participation = participation
+        # "free_port": the nearest reachable station that shows a free charger at the request
+        # (port status), else the nearest reachable one
+        self.other_choice = other_choice
         # separate stream so that prediction settings do not change the simulated demand
         self.pred_rng = np.random.default_rng(seed + 100_003)
         self.max_drain_s = max_drain_s
         self.layout = layout
+        self.consumption = consumption_kwh_per_km
         self.meta = station_meta(layout)
         self._by_id = {m["id"]: m for m in self.meta}
         self.rng = np.random.default_rng(seed)
@@ -124,6 +134,8 @@ class SumoCorridorEnv:
         self.n_rejected: int = 0
         self.n_noncompliant: int = 0          # dispatches ignored by the driver
         self.n_lost: int = 0                  # left the network without charging
+        self.waits_own: List[float] = []      # waits of participants and of non-participants
+        self.waits_other: List[float] = []
         self.draining: bool = False
         self.drain_s: float = 0.0
 
@@ -181,7 +193,9 @@ class SumoCorridorEnv:
             except Exception:
                 occupants = []
             remaining: List[float] = []
+            own_r: List[bool] = []
             for vid in occupants:
+                own_r.append(self._participates(vid))
                 v = self.vehicles.get(vid)
                 if v and v.charge_end_sim_s is not None:
                     remaining.append(max(0.0, (v.charge_end_sim_s - self.sim_time) / 60.0))
@@ -195,19 +209,40 @@ class SumoCorridorEnv:
                 remaining_times=remaining[:m["n_chargers"]],
                 committed=self._committed(m),
             ))
+            if self.participation < 1.0:
+                result[-1].remaining_own = own_r[:m["n_chargers"]]
+                result[-1].committed_own = self._committed(m, flags=True)
         return result
 
-    def _committed(self, m: dict) -> List[tuple]:
-        """Queued and en-route vehicles of a station: (minutes to arrival, nominal charge minutes)."""
+    def _n_occupied(self, m: dict) -> int:
+        try:
+            return len(traci.parkingarea.getVehicleIDs(m["pa_id"]))
+        except Exception:
+            return 0
+
+    def _committed(self, m: dict, flags: bool = False) -> list:
+        """Queued and en-route vehicles of a station: (minutes to arrival, nominal charge minutes).
+        Non-participants driving to a station are not visible. With flags=True, return for each
+        entry whether it is a participant (same order)."""
         out = []
         for v in self.vehicles.values():
             if v.assigned_station != m["id"] or v.status not in ("en_route", "near_station"):
                 continue
+            own = self._participates(v.id)
+            if v.status == "en_route" and not own:
+                continue
             dist = 0.0 if v.status == "near_station" else max(0.0, m["pos_km"] - v.pos_km)
-            soc_arr = max(0.0, v.soc - CONSUMPTION_KWH_PER_KM * dist / v.battery_kwh)
+            soc_arr = max(0.0, v.soc - self.consumption * dist / v.battery_kwh)
             out.append((dist / SPEED_KMH * 60.0,
-                        max(0.0, TARGET_SOC - soc_arr) * v.battery_kwh / m["power_kw"] * 60.0))
-        return sorted(out)   # queued vehicles (0 min to arrival) first
+                        max(0.0, TARGET_SOC - soc_arr) * v.battery_kwh / m["power_kw"] * 60.0, own))
+        out.sort(key=lambda e: e[:2])   # queued vehicles (0 min to arrival) first
+        return [e[2] for e in out] if flags else [e[:2] for e in out]
+
+    def _participates(self, vid: str) -> bool:
+        """Fixed per vehicle, independent of the method and of the compliance draw."""
+        if self.participation >= 1.0:
+            return True
+        return np.random.default_rng([self.seed, zlib.crc32(vid.encode()), 7]).random() < self.participation
 
     def _complies(self, vid: str) -> bool:
         """Fixed per driver and independent of the dispatch method."""
@@ -218,7 +253,7 @@ class SumoCorridorEnv:
     def _reachable(self, pos_km: float, soc: float, battery_kwh: float, station_pos_km: float) -> bool:
         limit = self.max_detour_km
         if limit is None:
-            limit = soc * battery_kwh / CONSUMPTION_KWH_PER_KM
+            limit = soc * battery_kwh / self.consumption
         return -1.0 <= station_pos_km - pos_km <= limit
 
     def travel_times(self, requests: List[EVRequest]) -> Dict[tuple, float]:
@@ -239,9 +274,9 @@ class SumoCorridorEnv:
         out = []
         last_km = self.meta[-1]["pos_km"]
         for v in self.vehicles.values():
-            if v.status != "driving" or v.soc <= self.charge_threshold:
+            if v.status != "driving" or v.soc <= self.charge_threshold or not self._participates(v.id):
                 continue
-            km_to_cross = (v.soc - self.charge_threshold) * v.battery_kwh / CONSUMPTION_KWH_PER_KM
+            km_to_cross = (v.soc - self.charge_threshold) * v.battery_kwh / self.consumption
             release = km_to_cross / SPEED_KMH * 60.0
             if release <= horizon_min and v.pos_km + km_to_cross < last_km:
                 if self.pred_rng.random() > self.prediction_visibility:
@@ -268,6 +303,16 @@ class SumoCorridorEnv:
                     # stranded only if a station still lies ahead; otherwise it has left the corridor
                     self.n_no_station += v.pos_km < self.meta[-1]["pos_km"]
                     continue
+                if not self._participates(v.id):   # drives to the nearest reachable station
+                    if v.request_sim_s is None:
+                        v.request_sim_s = self.sim_time
+                        self.n_requests += v.request_sim_s >= self.warmup_s
+                    near = [mm for mm in self.meta if self._reachable(v.pos_km, v.soc, v.battery_kwh, mm["pos_km"])]
+                    if self.other_choice == "free_port":
+                        free = [mm for mm in near if self._n_occupied(mm) < mm["n_chargers"]]
+                        near = free or near
+                    self._send(v.id, v, min(near, key=lambda mm: mm["pos_km"]))
+                    continue
                 requests.append(EVRequest(
                     id=v.id,
                     position_km=v.pos_km,
@@ -279,6 +324,21 @@ class SumoCorridorEnv:
                     v.request_sim_s = self.sim_time
                     self.n_requests += v.request_sim_s >= self.warmup_s
         return requests
+
+    def _send(self, vid: str, v, m: dict) -> None:
+        """Give the vehicle a parking stop at station m."""
+        try:
+            # The charging duration is drawn when charging starts; the stop is
+            # held until the environment releases it in step().
+            traci.vehicle.setParkingAreaStop(vid, m["pa_id"], duration=HOLD_STOP_S)
+            v.status = "en_route"
+            v.assigned_station = m["id"]
+            v.station_arrival_sim_s = None  # reset; set when proximity detected
+            v.charge_end_sim_s = None
+        except traci.TraCIException as e:
+            logger.debug(f"Dispatch failed {vid}->{m['id']}: {e}")
+            self.n_rejected += 1
+            v.status = "driving"
 
     def _sync_states(self) -> None:
         """Update SOC and position for all active vehicles."""
@@ -330,7 +390,7 @@ class SumoCorridorEnv:
             # SOC: distance-based discharge (not while charging)
             if v.status != "charging":
                 delta_km = max(0.0, (new_dist_m - v.last_dist_m) / 1000.0)
-                v.soc = max(0.0, v.soc - CONSUMPTION_KWH_PER_KM * delta_km / v.battery_kwh)
+                v.soc = max(0.0, v.soc - self.consumption * delta_km / v.battery_kwh)
             v.pos_km     = new_pos_km
             v.last_dist_m = new_dist_m
 
@@ -420,7 +480,7 @@ class SumoCorridorEnv:
                 try:
                     dist_m = traci.vehicle.getDistance(vid)
                     delta_km = max(0.0, (dist_m - v.last_dist_m) / 1000.0)
-                    v.soc = max(0.0, v.soc - CONSUMPTION_KWH_PER_KM * delta_km / v.battery_kwh)
+                    v.soc = max(0.0, v.soc - self.consumption * delta_km / v.battery_kwh)
                     v.last_dist_m = dist_m
                 except traci.TraCIException:
                     pass
@@ -434,6 +494,7 @@ class SumoCorridorEnv:
                 v.station_arrival_sim_s = None
                 if v.request_sim_s is not None and v.request_sim_s >= self.warmup_s:
                     self.completed_waits.append(wait_min)
+                    (self.waits_own if self._participates(vid) else self.waits_other).append(wait_min)
                     self.service_minutes += duration_s / 60.0
                     self.station_times.append(wait_min + duration_s / 60.0)
                     self.station_log.append((v.assigned_station, wait_min, duration_s / 60.0))
@@ -498,6 +559,8 @@ class SumoCorridorEnv:
             "n_rejected": self.n_rejected,
             "n_noncompliant": self.n_noncompliant,
             "n_lost": self.n_lost,
+            "mean_wait_own_min": float(np.mean(self.waits_own)) if self.waits_own else float("nan"),
+            "mean_wait_other_min": float(np.mean(self.waits_other)) if self.waits_other else float("nan"),
             "access_mean_min": float(a.mean()),
             "access_max_min": float(a.max()),
             "drain_min": self.drain_s / 60.0,

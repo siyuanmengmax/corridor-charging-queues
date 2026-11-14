@@ -160,6 +160,8 @@ class CorridorSimulation:
         prediction_noise: float = 0.0,           # relative error of predicted request time and SOC
         prediction_visibility: float = 1.0,      # share of upcoming vehicles the dispatcher can see
         compliance: float = 1.0,                 # share of drivers who follow the assigned station
+        participation: float = 1.0,              # share of EVs that use the dispatcher at all
+        other_choice: str = "nearest",           # non-participants: "nearest" or "free_port"
         rng_seed: int = 42,
     ):
         self.corridor_length_km = corridor_length_km
@@ -183,6 +185,12 @@ class CorridorSimulation:
         self.prediction_noise = prediction_noise
         self.prediction_visibility = prediction_visibility
         self.compliance = compliance
+        # Non-participants pick the nearest reachable station themselves; the dispatcher does not
+        # see them until they are at a station (queued or charging)
+        self.participation = participation
+        # "free_port": the nearest reachable station that shows a free charger at the request
+        # (port status, as a driver with a charging app sees it), else the nearest reachable one
+        self.other_choice = other_choice
         self._seed = rng_seed
         # separate stream so that prediction settings do not change the simulated demand
         self.pred_rng = np.random.default_rng(rng_seed + 100_003)
@@ -213,6 +221,8 @@ class CorridorSimulation:
         self.n_no_station: int = 0            # needed charging with no reachable station
         self.n_rejected: int = 0              # assignments to an unreachable station
         self.n_noncompliant: int = 0          # dispatches ignored by the driver
+        self.waits_own: List[float] = []      # waits of participants and of non-participants
+        self.waits_other: List[float] = []
         self.draining: bool = False
         self.drain_minutes: float = 0.0
 
@@ -282,6 +292,10 @@ class CorridorSimulation:
                 remaining_times=qs.remaining_times(self.sim_time),
                 committed=self._committed(st, qs),
             ))
+            if self.participation < 1.0:
+                result[-1].remaining_own = [self._participates(vid) for vid, _ in qs.in_service]
+                result[-1].committed_own = ([self._participates(vid) for vid, _ in qs.waiting]
+                                            + [True] * (len(result[-1].committed) - len(qs.waiting)))
         return result
 
     def _committed(self, st: ChargingStation, qs: QueueState) -> List[Tuple[float, float]]:
@@ -291,7 +305,7 @@ class CorridorSimulation:
             v = self.vehicles[vid]
             out.append((0.0, max(0.0, self.target_soc - v.soc) * v.battery_kwh / st.power_kw * 60.0))
         for v in self.vehicles.values():
-            if v.status == "en_route" and v.assigned_station == st.id:
+            if v.status == "en_route" and v.assigned_station == st.id and self._participates(v.id):
                 dist = max(0.0, st.position_km - v.position_km)
                 soc_arr = max(0.0, v.soc - v.consumption_kwh_per_km * dist / v.battery_kwh)
                 out.append((dist / v.speed_kmh * 60.0,
@@ -332,6 +346,17 @@ class CorridorSimulation:
                     # stranded only if a station still lies ahead; otherwise it has left the corridor
                     self.n_no_station += v.position_km < self.stations[-1].position_km
                     continue
+                if v.request_time is None:
+                    v.request_time = self.sim_time
+                    self.n_requests += v.request_time >= self.warmup_min
+                if not self._participates(v.id):   # drives to the nearest reachable station
+                    near = [st for st in self.stations if self._reachable(v.position_km, v.soc, v.battery_kwh, st)]
+                    v.status = "en_route"
+                    if self.other_choice == "free_port":
+                        free = [st for st in near if self.queue_states[st.id].n_free() > 0]
+                        near = free or near
+                    v.assigned_station = min(near, key=lambda st: st.position_km).id
+                    continue
                 requests.append(EVRequest(
                     id=v.id,
                     position_km=v.position_km,
@@ -349,7 +374,7 @@ class CorridorSimulation:
         out = []
         last_km = self.stations[-1].position_km
         for v in self.vehicles.values():
-            if v.status != "driving" or v.soc <= self.charge_threshold:
+            if v.status != "driving" or v.soc <= self.charge_threshold or not self._participates(v.id):
                 continue
             km_to_cross = (v.soc - self.charge_threshold) * v.battery_kwh / self.consumption_mean
             release = km_to_cross / v.speed_kmh * 60.0
@@ -387,6 +412,12 @@ class CorridorSimulation:
             if v.status == "pending":
                 v.status = "driving"
 
+    def _participates(self, vid: str) -> bool:
+        """Fixed per vehicle, independent of the method and of the compliance draw."""
+        if self.participation >= 1.0:
+            return True
+        return np.random.default_rng([self._seed, zlib.crc32(vid.encode()), 7]).random() < self.participation
+
     def _complies(self, vid: str) -> bool:
         """Fixed per driver and independent of the dispatch method."""
         if self.compliance >= 1.0:
@@ -397,6 +428,7 @@ class CorridorSimulation:
         if v.request_time is None or v.request_time < self.warmup_min:
             return
         self.completed_waits.append(wait)
+        (self.waits_own if self._participates(v.id) else self.waits_other).append(wait)
         self.service_minutes += duration
         self.station_times.append(wait + duration)
         self.station_log.append((sid, wait, duration))
@@ -564,6 +596,8 @@ class CorridorSimulation:
             "n_no_station": self.n_no_station,
             "n_rejected": self.n_rejected,
             "n_noncompliant": self.n_noncompliant,
+            "mean_wait_own_min": float(np.mean(self.waits_own)) if self.waits_own else float("nan"),
+            "mean_wait_other_min": float(np.mean(self.waits_other)) if self.waits_other else float("nan"),
             "access_mean_min": float(a.mean()),
             "access_max_min": float(a.max()),
             "drain_min": self.drain_minutes,

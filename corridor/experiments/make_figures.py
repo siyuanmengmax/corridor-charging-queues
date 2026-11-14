@@ -1,5 +1,5 @@
 """
-Figures of the TR-D manuscript from the formal result files (run from the repository root).
+Figures of the manuscript from the formal result files (run from the repository root).
 
   python -m corridor.experiments.make_figures [--out paper/figures]
 
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     fig_threshold(R, out, "phase2_sumo", "fig_threshold.pdf")
     fig_threshold(R, out, "phase1", "fig_threshold_p1.pdf")
     fig_lookahead(R, out)
-    case = (latest("i95_case_2*.json") or []) + (latest("i95_case_m3_*.json") or [])
+    case = latest("i95us_main_*.json")   # US vehicle parameters (run_i95_us.sh)
     if case:
         fig_i95(case, out)
     print(f"figures written to {out}")

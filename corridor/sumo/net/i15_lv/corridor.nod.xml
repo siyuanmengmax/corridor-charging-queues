@@ -1,0 +1,9 @@
+<nodes>
+    <node id="n_source" x="-500" y="0" type="priority"/>
+    <node id="n0" x="0" y="0" type="priority"/>
+    <node id="n1" x="58950" y="0" type="priority"/>
+    <node id="n2" x="117900" y="0" type="priority"/>
+    <node id="n3" x="176850" y="0" type="priority"/>
+    <node id="n4" x="235800" y="0" type="priority"/>
+    <node id="n_sink" x="236300" y="0" type="priority"/>
+</nodes>

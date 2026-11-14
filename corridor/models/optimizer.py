@@ -73,6 +73,10 @@ class ChargingStation:
     # Vehicles already committed to this station but not yet charging:
     # (minutes until arrival — 0 if already queued, nominal charging minutes)
     committed: List[Tuple[float, float]] = field(default_factory=list)
+    # With partial participation: which vehicles in service / committed belong to the dispatcher
+    # (None = all of them)
+    remaining_own: Optional[List[bool]] = None
+    committed_own: Optional[List[bool]] = None
 
     def available_capacity(self, delta_t: float) -> float:
         """C_s(k) = Σ_m max(0, ΔT - τ_{s,m}^rem)"""

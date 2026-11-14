@@ -50,19 +50,24 @@ class Timed:
         return res
 
 
-def closed_loop(layout: str, rate: float, n_seeds: int) -> list:
+def closed_loop(layout: str, rate: float, n_seeds: int, vehicles: str = "eu") -> list:
     from .run_experiments import CORRIDOR_PARAMS, run_episode
+    from ..vehicles import get_profile
+    profile = get_profile(vehicles)
     out = []
     for m in METHODS:
         for seed in range(n_seeds):
             lay = get_layout(layout)
             stations, length = lay.charging_stations(), lay.length_km
-            params = {**CORRIDOR_PARAMS, **demand(rate), "corridor_length_km": length,
+            params = {**CORRIDOR_PARAMS, **demand(rate), **profile.phase1_params(), "corridor_length_km": length,
                       "sim_duration_min": WARMUP_MIN + MEASURE_MIN, "warmup_min": WARMUP_MIN,
                       "charge_threshold": 0.30, "max_detour_km": None}
-            opt = Timed(make_method(m))
+            inner = make_method(m)
+            if hasattr(inner, "set_vehicles"):
+                inner.set_vehicles(profile)
+            opt = Timed(inner)
             run_episode(m, opt, seed, stations, params)
-            out += [{"part": "closed_loop", "layout": layout, "method": m, "seed": seed,
+            out += [{"part": "closed_loop", "layout": layout, "vehicles": vehicles, "method": m, "seed": seed,
                      "n_released": a, "n_predicted": b, "ms": ms} for a, b, ms in opt.log]
     return out
 
@@ -122,9 +127,19 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--n_seeds", type=int, default=5)
     ap.add_argument("--output_dir", default="corridor/results")
+    ap.add_argument("--i95_us_only", action="store_true",
+                    help="only the I-95 closed loop with US vehicle parameters (2026-11 rerun)")
+    ap.add_argument("--i15_us_only", action="store_true",
+                    help="only the I-15 closed loop (1.8 veh/min) with US vehicle parameters")
     args = ap.parse_args()
-    R = closed_loop("synthetic", RATES["high"], args.n_seeds) + closed_loop("i95_nc", 1.0, args.n_seeds) + scaling()
-    out = Path(args.output_dir) / f"timing_{time.strftime('%Y%m%d_%H%M%S')}.json"
+    if args.i95_us_only:
+        R, tag = closed_loop("i95_nc", 1.0, args.n_seeds, "us"), "timing_i95us"
+    elif args.i15_us_only:
+        R, tag = closed_loop("i15_lv", 1.8, args.n_seeds, "us"), "timing_i15us"
+    else:
+        R = closed_loop("synthetic", RATES["high"], args.n_seeds) + closed_loop("i95_nc", 1.0, args.n_seeds) + scaling()
+        tag = "timing"
+    out = Path(args.output_dir) / f"{tag}_{time.strftime('%Y%m%d_%H%M%S')}.json"
     out.write_text(json.dumps(R))
     print(f"Saved {len(R)} records to {out}")
     summarize(R)

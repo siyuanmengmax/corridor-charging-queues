@@ -60,11 +60,19 @@ def nominal_charge(ev: EVRequest, st: ChargingStation, travel_min: float,
 
 class _BacklogBase:
     def __init__(self, beta: float = 1.0, gamma_w: float = 1.0,
-                 speed_kmh: float = 100.0, target_soc: float = 0.80):
+                 speed_kmh: float = 100.0, target_soc: float = 0.80,
+                 consumption: float = 0.20, battery_ref_kwh: float = 70.0):
         self.beta = beta
         self.gamma_w = gamma_w
         self.speed_kmh = speed_kmh
         self.target_soc = target_soc
+        self.consumption = consumption          # kWh/km, for the SOC on arrival
+        self.battery_ref_kwh = battery_ref_kwh  # mean battery, for reference sessions
+
+    def set_vehicles(self, profile) -> None:
+        """Use the consumption and mean battery of a corridor.vehicles profile."""
+        self.consumption = profile.consumption_kwh_per_km
+        self.battery_ref_kwh = profile.battery_mean_kwh
 
     def _travel(self, ev, st, travel_times) -> float:
         if travel_times and (ev.id, st.id) in travel_times:
@@ -92,11 +100,10 @@ class BacklogGreedyOptimizer(_BacklogBase):
     times, including those of the vehicles queued there, are computed at that power.
     With remaining_known=False the rule sees only which chargers are busy (port status, as
     shared under 23 CFR 680.116(c)): each busy charger is taken to be half-way through, and
-    each queued vehicle to need, a reference session of REF_ENERGY_KWH at the station power.
+    each queued vehicle to need, a reference session (20-80% SOC of the mean battery) at the
+    station power.
     With queue_known=False it does not see the vehicles queued at the station either.
     """
-
-    REF_ENERGY_KWH = 0.6 * 70.0   # 20-80% SOC of a 70 kWh battery
 
     def __init__(self, en_route: bool = True, assumed_power_kw: Optional[float] = None,
                  remaining_known: bool = True, queue_known: bool = True, **kwargs):
@@ -127,14 +134,86 @@ class BacklogGreedyOptimizer(_BacklogBase):
                              else [c for c in known if c[0] <= 1e-6])
                 remaining = st.remaining_times
                 if not self.remaining_known:
-                    ref = self.REF_ENERGY_KWH / power * 60.0
+                    ref = 0.6 * self.battery_ref_kwh / power * 60.0
                     remaining = [0.5 * ref] * len(st.remaining_times)
                     committed = [(eta, ref) for eta, _ in committed]
                 if not self.queue_known:
                     committed = []
                 view = ChargingStation(st.id, st.position_km, st.n_chargers, power,
                                        remaining, committed)
-                d = nominal_charge(ev, view, tau, self.target_soc, self.speed_kmh)
+                d = nominal_charge(ev, view, tau, self.target_soc, self.speed_kmh, self.consumption)
+                wait = max(0.0, charger_free_times(view, tau)[0] - tau)
+                cost = tau + self.beta * d + self.gamma_w * wait
+                if cost < best_cost:
+                    best, best_cost, best_entry = st.id, cost, (tau, d)
+            if best is not None:
+                assignments[ev.id] = best
+                added[best].append(best_entry)
+        res = self._empty(stations, status="GREEDY")
+        res.assignments = assignments
+        res.solve_time_ms = (time.perf_counter() - t0) * 1000.0
+        return res
+
+
+class OwnFleetGreedyOptimizer(_BacklogBase):
+    """Backlog greedy for a dispatcher that serves only part of the EVs (partial participation).
+
+    The dispatcher always knows its own vehicles: those it sent to a station (en route or
+    queued, from its own records) and those charging there. Other vehicles are seen only
+    through the station data of the chosen level:
+      own            no station data; chargers used by others look free
+      port           + port status and power (23 CFR 680.116(c)): each charger busy with another
+                     vehicle is taken to be half-way through a reference session
+      port_queue     + number of other vehicles queued, each needing a reference session
+      station        + remaining charging time of every vehicle in service and the charging
+                     time of every queued vehicle (full station-side data)
+    Vehicles that others are driving to a station are never seen. With full participation
+    all four levels coincide with backlog greedy.
+    """
+
+    LEVELS = ("own", "port", "port_queue", "station")
+
+    def __init__(self, level: str = "station", **kwargs):
+        super().__init__(**kwargs)
+        assert level in self.LEVELS, level
+        self.level = level
+
+    def _view(self, st: ChargingStation) -> ChargingStation:
+        own_r = st.remaining_own or [True] * len(st.remaining_times)
+        own_c = st.committed_own or [True] * len(st.committed)
+        ref = 0.6 * self.battery_ref_kwh / st.power_kw * 60.0
+        remaining = [r for r, o in zip(st.remaining_times, own_r) if o]
+        committed = [c for c, o in zip(st.committed, own_c) if o]
+        others_r = [r for r, o in zip(st.remaining_times, own_r) if not o]
+        others_q = [c for c, o in zip(st.committed, own_c) if not o]   # queued at the site
+        if self.level == "station":
+            remaining += others_r
+            committed += others_q
+        elif self.level in ("port", "port_queue"):
+            remaining += [0.5 * ref] * len(others_r)
+            if self.level == "port_queue":
+                committed += [(0.0, ref)] * len(others_q)
+        return ChargingStation(st.id, st.position_km, st.n_chargers, st.power_kw,
+                               remaining, sorted(committed))
+
+    def solve(self, ev_requests: List[EVRequest], stations: List[ChargingStation],
+              travel_times: Optional[Dict[Tuple[str, str], float]] = None) -> OptimizationResult:
+        t0 = time.perf_counter()
+        if not ev_requests:
+            return self._empty(stations)
+        views = {st.id: self._view(st) for st in stations}
+        added: Dict[str, List[Tuple[float, float]]] = {st.id: [] for st in stations}
+        assignments = {}
+        for ev in sorted(ev_requests, key=lambda e: e.soc):
+            best, best_cost, best_entry = None, float("inf"), None
+            for st in stations:
+                tau = self._travel(ev, st, travel_times)
+                if tau >= UNREACHABLE:
+                    continue
+                v0 = views[st.id]
+                view = ChargingStation(st.id, st.position_km, st.n_chargers, st.power_kw,
+                                       v0.remaining_times, v0.committed + added[st.id])
+                d = nominal_charge(ev, view, tau, self.target_soc, self.speed_kmh, self.consumption)
                 wait = max(0.0, charger_free_times(view, tau)[0] - tau)
                 cost = tau + self.beta * d + self.gamma_w * wait
                 if cost < best_cost:
@@ -170,7 +249,7 @@ class BacklogAwareOptimizer(_BacklogBase):
                 tau = self._travel(ev, st, travel_times)
                 if tau >= UNREACHABLE:
                     continue
-                d = nominal_charge(ev, st, tau, self.target_soc, self.speed_kmh)
+                d = nominal_charge(ev, st, tau, self.target_soc, self.speed_kmh, self.consumption)
                 wait = max(0.0, charger_free_times(st, tau)[0] - tau)
                 key = (ev.id, st.id)
                 cost[key] = tau + self.beta * d + self.gamma_w * wait
@@ -270,7 +349,7 @@ class FluidMPCOptimizer(_BacklogBase):
                 tau = self._travel(ev, st, travel_times)
                 if tau >= UNREACHABLE:
                     continue
-                d = nominal_charge(ev, st, tau, self.target_soc, self.speed_kmh)
+                d = nominal_charge(ev, st, tau, self.target_soc, self.speed_kmh, self.consumption)
                 key = (ev.id, st.id)
                 base_cost[key] = tau + self.beta * d
                 work[key], arr[key] = d, slot(tau)
@@ -299,7 +378,7 @@ class FluidMPCOptimizer(_BacklogBase):
             for eta, service in st.committed:
                 fixed[slot(eta)] += service
             works = [w for (i, s), w in work.items() if s == st.id] + [c[1] for c in st.committed]
-            d_s = sum(works) / len(works) if works else 0.5 * 70.0 / st.power_kw * 60.0
+            d_s = sum(works) / len(works) if works else 0.5 * self.battery_ref_kwh / st.power_kw * 60.0
             m.addConstr(B[st.id, 0] == sum(st.remaining_times))
             for t in range(T):
                 arriving = gp.quicksum(work[i, st.id] * x[i, st.id]
